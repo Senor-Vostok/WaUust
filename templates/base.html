@@ -6,6 +6,7 @@
     <title>Карточки направлений (специальностей)</title>
     <style>
         body {
+            transition: background-color 1s ease;
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
             margin: 0;
@@ -25,6 +26,7 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             width: 100%;
+            margin-top: 60px;
         }
         .card {
             border-radius: 10px;
@@ -48,14 +50,53 @@
             font-size: 1.2em;
         }
         .card-description {
-            background-color: #f9f9f9;
+            background-color: rgba(255, 255, 255, 0.3);
             font-size: 1em;
             color: #333;
             text-align: left;
         }
-    </style>
+        .search-bar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+        }
+        #search-input {
+            width: 300px;
+            padding: 8px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        #search-button {
+            padding: 8px 16px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #search-button:hover {
+            background-color: #0056b3;
+        }
+</style>
 </head>
 <body>
+<div class="search-bar-container">
+    <input type="text" id="search-input" placeholder="Поиск по карточкам..." />
+    <button id="search-button">Поиск</button>
+</div>
 <div class="main-container">
     <div class="card-container">
         {% for data in data %}
@@ -66,7 +107,6 @@
         {% endfor %}
     </div>
 </div>
-
 <script>
     function toggleCard(card) {
         const isExpanded = card.classList.contains('expanded');
@@ -74,17 +114,27 @@
             c.classList.remove('expanded');
             c.querySelector('.card-description').innerHTML = '';
         });
-
         if (!isExpanded) {
             card.classList.add('expanded');
             const description = card.getAttribute('data-description');
             card.querySelector('.card-description').innerHTML = description;
+            const cardColor = window.getComputedStyle(card).backgroundColor;
+            const darkerColor = darkenColor(cardColor, 0.7); // Коэффициент затемнения (0.7 = 70%)
+            document.body.style.backgroundColor = darkerColor;
+        } else {
+            document.body.style.backgroundColor = '#f5f5f5';
         }
+    }
+    function darkenColor(rgb, factor) {
+        const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+        if (!match) return rgb;
+        const [_, r, g, b] = match.map(Number);
+        const darken = value => Math.max(0, Math.floor(value * factor));
+        return `rgb(${darken(r)}, ${darken(g)}, ${darken(b)})`;
     }
     function applyGradientToCards() {
         const cards = document.querySelectorAll('.card');
         const totalCards = cards.length;
-
         cards.forEach((card, index) => {
             const greenValue = Math.floor((255 - (index / totalCards) * 255) * 0.85);
             const redValue = Math.floor(((index / totalCards) * 255) * 0.85);
@@ -92,6 +142,22 @@
             card.style.backgroundColor = `rgb(${redValue}, ${greenValue}, ${blueValue})`;
         });
     }
+    document.getElementById('search-button').addEventListener('click', function() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            const title = card.querySelector('.card-title').textContent.toLowerCase();
+            card.style.display = title.includes(query) ? 'block' : 'none';
+        });
+    });
+    document.getElementById('search-input').addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            const title = card.querySelector('.card-title').textContent.toLowerCase();
+            card.style.display = title.includes(query) ? 'block' : 'none';
+        });
+    });
     document.addEventListener('DOMContentLoaded', applyGradientToCards);
 </script>
 </body>
