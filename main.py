@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from build.update_sql import ManagerSQL
+import os
 import math
 
 app = Flask(__name__)
@@ -27,14 +28,44 @@ def testing():
     massive_areas = manager.get_data('SELECT * FROM aos_person')
     result = sorted(massive_areas, key=lambda x: calculate_popularity(x))
     result.reverse()
+    facultative = set(i[0] for i in manager.get_data("SELECT facultative FROM aos_person") if i[0])
     data = [{"title": f"{i[0]}\\n{i[1]}", "description": f"Профиль: {i[2]}\\n\\nФакультет: {i[3]}\\n\\n"
              f"Минимальный средний балл: {get_item('SELECT average FROM sl_years WHERE code=? AND name=?', (i[0], i[1]), 'отсутствует')}\\n"
              f"Общее количество бюджетных мест: {i[4]}\\n"
              f"Стоимость обучения на платной основе: {manager.get_data('SELECT price FROM po_paid WHERE code=? AND (profile=? OR name=?)',(i[0], i[2], i[1]))[0][0]} р"} for i in result]
-    return render_template('base.html', data=data)
+    return render_template('base.html', data=data, facultative=facultative)
+
+
+@app.route('/update-data', methods=['POST'])
+def update_data() -> str:
+    category = request.form.get('category', 'all')
+    sort = request.form.get('sort', 'title-asc')
+    if category == "all":
+        massive_areas = manager.get_data('SELECT * FROM aos_person')
+    else:
+        massive_areas = manager.get_data(f'SELECT * FROM aos_person WHERE facultative="{category}"')
+    if sort == 'popularity':
+        result = sorted(massive_areas, key=lambda x: calculate_popularity(x))
+    elif sort == 'score':
+        result = sorted(massive_areas, key=lambda x: -(get_item('SELECT average FROM sl_years WHERE code=? AND name=?', (x[0], x[1]), 0)))
+    elif sort == "price":
+        result = sorted(massive_areas, key=lambda x: -(manager.get_data('SELECT price FROM po_paid WHERE code=? AND (profile=? OR name=?)', (x[0], x[2], x[1]))[0][0]))
+    elif sort == "budget":
+        result = sorted(massive_areas, key=lambda x: x[4])
+
+    result.reverse()
+    facultative = set(i[0] for i in manager.get_data("SELECT facultative FROM aos_person") if i[0])
+    data = [{"title": f"{i[0]}\\n{i[1]}", "description": f"Профиль: {i[2]}\\n\\nФакультет: {i[3]}\\n\\n"
+                                                         f"Минимальный средний балл: {get_item('SELECT average FROM sl_years WHERE code=? AND name=?', (i[0], i[1]), 'отсутствует')}\\n"
+                                                         f"Общее количество бюджетных мест: {i[4]}\\n"
+                                                         f"Стоимость обучения на платной основе: {manager.get_data('SELECT price FROM po_paid WHERE code=? AND (profile=? OR name=?)', (i[0], i[2], i[1]))[0][0]} р"} for i in result]
+
+    return render_template('base.html', data=data, facultative=facultative)
 
 
 if __name__ == "__main__":
     manager = ManagerSQL('uust.db')
     manager.open()
+    if 'uust.db' not in os.listdir():
+        manager.scrap()
     app.run()
