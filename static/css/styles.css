@@ -23,7 +23,7 @@ body {
     margin-top: 60px;
 }
 .card {
-    border-radius: 10px;
+    border-radius: 2px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     text-align: center;
@@ -54,7 +54,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #ffffff;
+    background-color: #d3c5ea;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -67,16 +67,16 @@ body {
     padding: 8px;
     font-size: 1em;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 2px;
     margin-right: 10px;
 }
 #search-button {
     padding: 8px 16px;
     font-size: 1em;
     color: #fff;
-    background-color: #007bff;
+    background-color: #2C0E75;
     border: none;
-    border-radius: 5px;
+    border-radius: 2px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -124,7 +124,7 @@ body {
     padding: 10px;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+    border-radius: 2px;
     z-index: 1000;
     overflow: auto;
 }
@@ -143,10 +143,11 @@ body {
     color: #555;
     margin-left: 5px;
     display: flex;
-    align-items: center;
+    align-items: left;
+    flex-direction: row;
 }
 .filter-menu input[type="radio"] {
-    margin-right: 10px;
+    margin-left: 10px;
 }
 .filter-menu select {
     width: 100%;
@@ -159,7 +160,7 @@ body {
     padding: 10px;
     font-size: 1em;
     color: #fff;
-    background-color: #007bff;
+    background-color: #2C0E75;
     border: none;
     border-radius: 5px;
     cursor: pointer;

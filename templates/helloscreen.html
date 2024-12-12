@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск направлений</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hellostyles.css') }}">
+</head>
+<body>
+<header>
+    <img src="static\image\uust.png" alt="Логотип">
+    <div class="info">
+        Данные сайт не является официальной версией сайта Уфимского Университета Науки и Технологий, а лишь позволяет отсортировать и проанализировать список очных направлений головного вуза, с официальных <a href="https://uust.ru/" style="color: #3F48CC;">источников</a>.<br>
+        Полная версия исходного кода работы сайта расположена на <a href="https://github.com/Senor-Vostok/WaUust" style="color: #3F48CC;">GitHub.com</a>
+    </div>
+</header>
+<main>
+<h2 style="color: #2C0E75;">Введите название или код направления</h2>
+<div class="search-box">
+    <input type="text" placeholder="Введите запрос">
+    <button onclick="search({{ direction }})">поиск</button>
+</div>
+<h3 style="color: #2C0E75;">и узнайте краткие сведения о нем</h3>
+<div class="advanced-search">
+    <button onclick="goToPage('/test')">Расширенный поиск</button>
+</div>
+<div id="search-results" style="display: none;">
+    <h2>Результаты поиска:</h2>
+    <ul id="results-list"></ul>
+</div>
+</main>
+<script src="{{ url_for('static', filename='js/helloscripts.js') }}"></script>
+</body>
+</html>

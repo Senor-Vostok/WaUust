@@ -24,7 +24,17 @@ def get_item(rule, params, exist):
 
 
 @app.route('/')
-def testing():
+def hello():
+    massive_areas = manager.get_data('SELECT * FROM aos_person')
+    pop_max = max(calculate_popularity(i) for i in massive_areas)
+    direction = [{"code": f"{i[0]}", "name": f"{i[2]}", "popularity": f"{int((calculate_popularity(i) / pop_max) * 10)} / 10", "min_avg_score": f"{get_item('SELECT average FROM sl_years WHERE code=? AND name=?', (i[0], i[1]), 'отсутствует')}",
+                  "cost": f"{manager.get_data('SELECT price FROM po_paid WHERE code=? AND (profile=? OR name=?)',(i[0], i[2], i[1]))[0][0]} р",
+                  "budget_places": f"{i[4]}"} for i in massive_areas]
+    return render_template('helloscreen.html', direction=direction)
+
+
+@app.route('/test')
+def test():
     massive_areas = manager.get_data('SELECT * FROM aos_person')
     result = sorted(massive_areas, key=lambda x: calculate_popularity(x))
     result.reverse()
