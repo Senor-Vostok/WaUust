@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
-from build.update_sql import ManagerSQL
-import os
+from app.update_sql import ManagerSQL
 import math
 
 app = Flask(__name__)
@@ -76,6 +75,5 @@ def update_data() -> str:
 if __name__ == "__main__":
     manager = ManagerSQL('uust.db')
     manager.open()
-    if 'uust.db' not in os.listdir():
-        manager.scrap()
-    app.run()
+    manager.scrap()
+    app.run(host="0.0.0.0", debug=True)
