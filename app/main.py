@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from app.update_sql import ManagerSQL
+from update_sql import ManagerSQL
 import math
 
 app = Flask(__name__)
