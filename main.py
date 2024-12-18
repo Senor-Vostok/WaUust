@@ -3,6 +3,9 @@ from app.update_sql import ManagerSQL
 import math
 
 app = Flask(__name__)
+manager = ManagerSQL('uust.db')
+manager.open()
+manager.scrap()
 
 
 def calculate_popularity(x):
@@ -73,7 +76,4 @@ def update_data() -> str:
 
 
 if __name__ == "__main__":
-    manager = ManagerSQL('uust.db')
-    manager.open()
-    manager.scrap()
     app.run(host="0.0.0.0", debug=True)
