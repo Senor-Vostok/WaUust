@@ -36,7 +36,7 @@ class ManagerSQL:
             if self.is_open:
                 return func(self, *args, **kwargs)
             else:
-                print("Р’ РґРѕСЃС‚СѓРїРµ РѕС‚РєР°Р·Р°РЅРѕ")
+                print("В доступе отказано")
                 return None
 
         return wrapper
@@ -57,10 +57,7 @@ class ManagerSQL:
                     count_paid INTEGER NOT NULL
                 )
                 ''')
-                try:
-                    cursor.execute('DELETE FROM aos_person')
-                except Exception:
-                    pass
+                cursor.execute('DELETE FROM aos_person')
                 table = get_table(url=url)[0][4:]
                 data = list(list())
                 for area in table:
@@ -79,9 +76,7 @@ class ManagerSQL:
                         count_paid = int(area[7]) if area[7] else 0
                     if count_paid != 0 or count_budget != 0:
                         data.append((code, name, profile, facultative, count_budget, count_paid))
-                cursor.executemany(
-                    '''INSERT INTO aos_person (code, name, profile, facultative, count_budget, count_paid) VALUES (?, ?, ?, ?, ?, ?)''',
-                    data)
+                cursor.executemany('''INSERT INTO aos_person (code, name, profile, facultative, count_budget, count_paid) VALUES (?, ?, ?, ?, ?, ?)''', data)
             elif do == "prices_of_paid":
                 cursor.execute('''
                                 CREATE TABLE IF NOT EXISTS po_paid (
@@ -91,15 +86,12 @@ class ManagerSQL:
                                     price INTEGER NOT NULL
                                 )
                                 ''')
-                try:
-                    cursor.execute('DELETE FROM po_paid')
-                except Exception:
-                    pass
+                cursor.execute('DELETE FROM po_paid')
                 tables = get_table(url=url)[:2]
                 data = list(list())
                 for table in tables:
                     for line in table[2:]:
-                        if line[3] == "РћС‡РЅР°СЏ":
+                        if line[3] == "Очная":
                             code, name, profile, price = line[0], line[1], line[2], int(line[4])
                             data.append((code, name, profile, price))
                 cursor.executemany('''INSERT INTO po_paid (code, name, profile, price) VALUES (?, ?, ?, ?)''', data)
@@ -112,10 +104,7 @@ class ManagerSQL:
                                average INTEGER NOT NULL
                                )
                                ''')
-                try:
-                    cursor.execute('DELETE FROM sl_years')
-                except Exception:
-                    pass
+                cursor.execute('DELETE FROM sl_years')
                 data = list(list())
                 for table in tables:
                     for line in table[1:]:
@@ -145,5 +134,5 @@ class ManagerSQL:
         data = cursor.fetchall()
         self.conn.close()
         if not data:
-            return [(0,)]
+            return [(0, )]
         return data
