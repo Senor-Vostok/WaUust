@@ -5,7 +5,7 @@ import math
 app = Flask(__name__)
 manager = ManagerSQL('uust.db')
 manager.open()
-manager.scrap()
+#manager.scrap()
 
 
 def calculate_popularity(x):
@@ -64,7 +64,6 @@ def update_data() -> str:
         result = sorted(massive_areas, key=lambda x: -(manager.get_data('SELECT price FROM po_paid WHERE code=? AND (profile=? OR name=?)', (x[0], x[2], x[1]))[0][0]))
     elif sort == "budget":
         result = sorted(massive_areas, key=lambda x: x[4])
-
     result.reverse()
     facultative = set(i[0] for i in manager.get_data("SELECT facultative FROM aos_person") if i[0])
     data = [{"title": f"{i[0]}\\n{i[1]}", "description": f"Профиль: {i[2]}\\n\\nФакультет: {i[3]}\\n\\n"

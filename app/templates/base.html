@@ -21,20 +21,18 @@
     <div>
         <label>Сортировка:</label>
         <div>
-            <input type="radio" id="sort-title-asc" name="sort" value="score" checked>
-            <label for="sort-title-asc">Баллы</label>
-        </div>
-        <div>
-            <input type="radio" id="sort-title-desc" name="sort" value="price">
-            <label for="sort-title-desc">Стоимость обучения</label>
-        </div>
-        <div>
-            <input type="radio" id="sort-color-asc" name="sort" value="budget">
-            <label for="sort-color-asc">Бюджетные места</label>
-        </div>
-        <div>
-            <input type="radio" id="sort-color-desc" name="sort" value="popularity">
-            <label for="sort-color-desc">Популярность</label>
+            <label>
+                <input type="radio" name="sort" value="score"> Баллы<span class="gradient-line right"><br></span>
+            </label>
+            <label>
+                <input type="radio" name="sort" value="price"> Стоимость обучения<span class="gradient-line right"><br></span>
+            </label>
+            <label>
+                <input type="radio" name="sort" value="budget"> Бюджетные места<span class="gradient-line left"><br></span>
+            </label>
+            <label>
+                <input type="radio" name="sort" value="popularity"> Популярность<span class="gradient-line left"><br></span>
+            </label>
         </div>
     </div>
     <button id="apply-filters">Применить</button>
