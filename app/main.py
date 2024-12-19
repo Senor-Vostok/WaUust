@@ -5,7 +5,7 @@ import math
 app = Flask(__name__)
 manager = ManagerSQL('uust.db')
 manager.open()
-#manager.scrap()
+manager.scrap()
 
 
 def calculate_popularity(x):
