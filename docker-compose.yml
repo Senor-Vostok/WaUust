@@ -7,3 +7,17 @@ services:
       - "5000:5000"
     volumes:
       - .:/app
+    environment:
+      - MYSQL_HOST=mysql_db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=1290AbUl17!
+      - MYSQL_DATABASE=uust_db
+
+  mysql:
+    container_name: mysql_db
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 1290AbUl17!
+      MYSQL_DATABASE: uust_db
+    ports:
+      - "3306:3306"

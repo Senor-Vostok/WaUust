@@ -1,4 +1,5 @@
-from sqlalchemy import create_engine, Column, Integer, String, Table, MetaData
+from sqlalchemy import create_engine, Column, Integer, String, MetaData
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 import requests
@@ -6,10 +7,12 @@ from bs4 import BeautifulSoup
 from functools import wraps
 
 urls = {
-    "areas of study": "https://uust.ru/admission/bachelor-and-specialist/adm-plan/2024/",
+    "areas_of_study": "https://uust.ru/admission/bachelor-and-specialist/adm-plan/2024/",
     "prices_of_paid": "https://uust.ru/admission/bachelor-and-specialist/tuition-fees/2024/",
     "score_last_years": "https://uust.ru/admission/bachelor-and-specialist/passing-scores/2024/"
 }
+
+Base = declarative_base()
 
 
 def get_table(url):
@@ -27,40 +30,52 @@ def get_table(url):
     return all_tables
 
 
+class AosPerson(Base):
+    __tablename__ = 'aos_person'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    code = Column(String(255), nullable=False)
+    name = Column(String(255), nullable=False)
+    profile = Column(String(255), nullable=False)
+    facultative = Column(String(255), nullable=False)
+    count_budget = Column(Integer, nullable=False)
+    count_paid = Column(Integer, nullable=False)
+
+
+class PoPaid(Base):
+    __tablename__ = 'po_paid'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    code = Column(String(255), nullable=False)
+    name = Column(String(255), nullable=False)
+    profile = Column(String(255), nullable=False)
+    price = Column(Integer, nullable=False)
+
+
+class SlYears(Base):
+    __tablename__ = 'sl_years'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    code = Column(String(255), nullable=False)
+    name = Column(String(255), nullable=False)
+    average = Column(Integer, nullable=False)
+
+
 class ManagerSQL:
-    def __init__(self, name):
-        self.engine = create_engine(f'sqlite:///{name}')
+    def __init__(self, username, password, host, database):
+        self.username = username
+        self.password = password
+        self.host = host
+        self.database = database
+        self.engine = create_engine(f'mysql+pymysql://{username}:{password}@{host}/{database}?charset=utf8mb4')
         self.metadata = MetaData()
         self.Session = sessionmaker(bind=self.engine)
         self.session = None
+        self.create_database()
+        Base.metadata.create_all(self.engine)
 
-        # Define tables
-        self.areas_of_study = Table(
-            'aos_person', self.metadata,
-            Column('code', String, nullable=False),
-            Column('name', String, nullable=False),
-            Column('profile', String, nullable=False),
-            Column('facultative', String, nullable=False),
-            Column('count_budget', Integer, nullable=False),
-            Column('count_paid', Integer, nullable=False)
-        )
-
-        self.prices_of_paid = Table(
-            'po_paid', self.metadata,
-            Column('code', String, nullable=False),
-            Column('name', String, nullable=False),
-            Column('profile', String, nullable=False),
-            Column('price', Integer, nullable=False)
-        )
-
-        self.score_last_years = Table(
-            'sl_years', self.metadata,
-            Column('code', String, nullable=False),
-            Column('name', String, nullable=False),
-            Column('average', Integer, nullable=False)
-        )
-
-        self.metadata.create_all(self.engine)
+    def create_database(self):
+        engine = create_engine(f'mysql+pymysql://{self.username}:{self.password}@{self.host}')
+        with engine.connect() as conn:
+            conn.execute(text(
+                f"CREATE DATABASE IF NOT EXISTS {self.database} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"))
 
     @staticmethod
     def access(func):
@@ -69,7 +84,7 @@ class ManagerSQL:
             if self.session:
                 return func(self, *args, **kwargs)
             else:
-                print("В доступе отказано")
+                print("В доступе отказано. Сессия не открыта.")
                 return None
 
         return wrapper
@@ -84,51 +99,48 @@ class ManagerSQL:
 
     @access
     def scrap(self):
+        all_data = {}
         for do in urls:
             url = urls[do]
-            if do == 'areas of study':
-                table_data = get_table(url=url)[0][4:]
-                data = []
-                for area in table_data:
-                    has_code = (((area[0].split())[0]).split('.'))[0].isdigit()
-                    if has_code:
-                        code, name = (area[0].split())[0], ' '.join((area[0].split())[1:])
-                        profile = area[1]
-                        facultative = area[2]
-                        count_budget = int(area[3]) if area[3] else 0
-                        count_paid = int(area[8]) if area[8] else 0
-                    else:
-                        code, name = data[-1]['code'], data[-1]['name']
-                        profile = area[0]
-                        facultative = area[1]
-                        count_budget = int(area[2]) if area[2] else 0
-                        count_paid = int(area[7]) if area[7] else 0
-                    if count_paid != 0 or count_budget != 0:
-                        data.append({'code': code, 'name': name, 'profile': profile, 'facultative': facultative,
-                                     'count_budget': count_budget, 'count_paid': count_paid})
-                self.session.execute(self.areas_of_study.insert(), data)
-
-            elif do == "prices_of_paid":
-                tables = get_table(url=url)[:2]
-                data = []
-                for table in tables:
-                    for line in table[2:]:
-                        if line[3] == "Очная":
-                            code, name, profile, price = line[0], line[1], line[2], int(line[4])
-                            data.append({'code': code, 'name': name, 'profile': profile, 'price': price})
-                self.session.execute(self.prices_of_paid.insert(), data)
-
-            elif do == "score_last_years":
-                tables = get_table(url=url)[:2]
-                data = []
-                for table in tables:
-                    for line in table[1:]:
-                        average = [int(i) for i in line[2:] if i.isdigit()]
-                        code, name, average = line[0], line[1], sum(average) // len(average)
-                        data.append({'code': code, 'name': name, 'average': average})
-                self.session.execute(self.score_last_years.insert(), data)
-
-        self.session.commit()
+            all_data[do] = get_table(url=url)
+        data_areas_of_study = []
+        data_prices_of_paid = []
+        data_score_last_years = []
+        for area in all_data["areas_of_study"][0][4:]:
+            has_code = (((area[0].split())[0]).split('.'))[0].isdigit()
+            if has_code:
+                code, name = (area[0].split())[0], ' '.join((area[0].split())[1:])
+                profile = area[1]
+                facultative = area[2]
+                count_budget = int(area[3]) if area[3] else 0
+                count_paid = int(area[8]) if area[8] else 0
+            else:
+                code, name = data_areas_of_study[-1]['code'], data_areas_of_study[-1]['name']
+                profile = area[0]
+                facultative = area[1]
+                count_budget = int(area[2]) if area[2] else 0
+                count_paid = int(area[7]) if area[7] else 0
+            if count_paid != 0 or count_budget != 0:
+                data_areas_of_study.append({'code': code, 'name': name, 'profile': profile, 'facultative': facultative,
+                                            'count_budget': count_budget, 'count_paid': count_paid})
+        for table in all_data["prices_of_paid"][:2]:
+            for line in table[2:]:
+                if line[3] == "Очная":
+                    code, name, profile, price = line[0], line[1], line[2], int(line[4])
+                    data_prices_of_paid.append({'code': code, 'name': name, 'profile': profile, 'price': price})
+        for table in all_data["score_last_years"][:2]:
+            for line in table[1:]:
+                average = [int(i) for i in line[2:] if i.isdigit()]
+                code, name, average = line[0], line[1], sum(average) // len(average)
+                data_score_last_years.append({'code': code, 'name': name, 'average': average})
+        try:
+            self.session.bulk_insert_mappings(AosPerson, data_areas_of_study)
+            self.session.bulk_insert_mappings(PoPaid, data_prices_of_paid)
+            self.session.bulk_insert_mappings(SlYears, data_score_last_years)
+            self.session.commit()
+        except Exception as e:
+            print(f"Ошибка при вставке данных: {e}")
+            self.session.rollback()
 
     @access
     def get_data(self, query, params=None):
