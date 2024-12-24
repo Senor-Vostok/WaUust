@@ -11,6 +11,7 @@ urls = {
     "score_last_years": "https://uust.ru/admission/bachelor-and-specialist/passing-scores/2024/"
 }
 
+
 def get_table(url):
     response = requests.get(url)
     response.raise_for_status()
@@ -24,6 +25,7 @@ def get_table(url):
             rows.append(cells)
         all_tables.append(rows)
     return all_tables
+
 
 class ManagerSQL:
     def __init__(self, name):
@@ -102,7 +104,8 @@ class ManagerSQL:
                         count_budget = int(area[2]) if area[2] else 0
                         count_paid = int(area[7]) if area[7] else 0
                     if count_paid != 0 or count_budget != 0:
-                        data.append({'code': code, 'name': name, 'profile': profile, 'facultative': facultative, 'count_budget': count_budget, 'count_paid': count_paid})
+                        data.append({'code': code, 'name': name, 'profile': profile, 'facultative': facultative,
+                                     'count_budget': count_budget, 'count_paid': count_paid})
                 self.session.execute(self.areas_of_study.insert(), data)
 
             elif do == "prices_of_paid":
