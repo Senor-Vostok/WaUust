@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточки направлений (специальностей)</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+<div class="filter-menu">
+    <h3>Фильтры</h3>
+    <div>
+        <label for="filter-category">Факультет:</label>
+        <select id="filter-category">
+            <option value="all">Все</option>
+            {% for facultative in facultative %}
+                <option value="{{ facultative }}">{{ facultative }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label>Сортировка:</label>
+        <div>
+            <label>
+                <input type="radio" name="sort" value="score"> Баллы<span class="gradient-line right"><br></span>
+            </label>
+            <label>
+                <input type="radio" name="sort" value="price"> Стоимость обучения<span class="gradient-line right"><br></span>
+            </label>
+            <label>
+                <input type="radio" name="sort" value="budget"> Бюджетные места<span class="gradient-line left"><br></span>
+            </label>
+            <label>
+                <input type="radio" name="sort" value="popularity"> Популярность<span class="gradient-line left"><br></span>
+            </label>
+        </div>
+    </div>
+    <button id="apply-filters">Применить</button>
+</div>
+<div class="search-bar-container">
+    <input type="text" id="search-input" placeholder="Поиск по карточкам..." />
+    <button id="search-button">Поиск</button>
+</div>
+<div class="scale-container">
+    <div class="scale-values top">Макс. соответствие</div>
+    <div class="scale-gradient">
+        <div class="scroll-indicator" id="scroll-indicator"></div>
+    </div>
+    <div class="scale-values">
+        <span>Макс. несоответствие</span>
+    </div>
+</div>
+<div class="main-container">
+    <div class="card-container">
+        {% for data in data %}
+        <div class="card" onclick="toggleCard(this)" data-description="{{ data.description|escape|replace('\\n', '<br>')|safe }}" data-title="{{ data.title|escape|replace('\\n', '<br>')|safe }}">
+            <div class="card-title">{{ data.title|replace('\\n', '<br>')|safe }}</div>
+            <div class="card-description"></div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

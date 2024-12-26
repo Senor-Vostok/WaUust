@@ -1,0 +1,202 @@
+body {
+    transition: background-color 0.5s ease;
+    font-family: Arial, sans-serif;
+    background-color: #d9dcde;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    position: relative;
+}
+.main-container {
+    display: flex;
+    justify-content: center;
+    width: 70%;
+}
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    width: 100%;
+    margin-top: 60px;
+}
+.card {
+    border-radius: 2px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    height: 200px;
+    position: relative;
+    color: white;
+}
+.card.expanded {
+    grid-column: span 2;
+    grid-row: span 2;
+    height: 400px;
+}
+.card-title {
+    padding: 10px;
+    font-size: 1.2em;
+}
+.card-description {
+    background-color: rgba(255, 255, 255, 0.3);
+    font-size: 1em;
+    color: #333;
+    text-align: left;
+}
+.search-bar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #d3c5ea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+}
+#search-input {
+    width: 300px;
+    padding: 8px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    margin-right: 10px;
+}
+#search-button {
+    padding: 8px 16px;
+    font-size: 1em;
+    color: #fff;
+    background-color: #2C0E75;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+#search-button:hover {
+    background-color: #0056b3;
+}
+.scale-container {
+    position: fixed;
+    left: 10px;
+    top: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.scale-values {
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 5px;
+}
+.scale-gradient {
+    width: 20px;
+    height: 200px;
+    background: linear-gradient(to bottom, #00ffff, #ff007f);
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    position: relative;
+}
+.scroll-indicator {
+    width: 10px;
+    height: 10px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: all 0.2s ease;
+}
+.filter-menu {
+    position: fixed;
+    top: 70px;
+    right: 10px;
+    width: 200px;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+}
+.filter-menu h3 {
+    font-size: 1.2em;
+    color: #333;
+}
+.filter-menu div {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+.filter-menu label {
+    font-size: 0.9em;
+    color: #555;
+    margin-left: 5px;
+    display: flex;
+    align-items: left;
+    flex-direction: row;
+}
+.filter-menu select {
+    width: 100%;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.filter-menu button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    color: #fff;
+    background-color: #2C0E75;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.filter-menu button:hover {
+    background-color: #0056b3;
+}
+.gradient-line {
+    display: inline-block;
+    width: 100%;
+    height: 3px;
+    margin-left: 10px;
+    position: relative;
+    background: linear-gradient(to right, rgb(1, 254, 255), rgb(254, 4, 130));
+    vertical-align: middle;
+}
+label {
+    display: flex;
+    align-items: center;
+}
+.gradient-line.right::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 6px;
+    height: 6px;
+    border-top: 3px solid rgb(254, 4, 130);
+    border-right: 3px solid rgb(254, 4, 130);
+    background: transparent;
+}
+.gradient-line.left::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) rotate(-45deg);
+    width: 6px;
+    height: 6px;
+    border-top: 3px solid rgb(1, 254, 255);
+    border-left: 3px solid rgb(1, 254, 255);
+    background: transparent;
+}
